@@ -1,15 +1,16 @@
 from pathlib import Path
-from django.utils.deprecation import MiddlewareMixin  # ✅ Add this for custom middleware
-
+from django.utils.deprecation import MiddlewareMixin
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-lq#k$zb)uen@0pb8j%&m54-dr$cmx8s%x#w8y_=4xhiu+4os&t'
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Allow all during development
+ALLOWED_HOSTS = ['*']  # Allow all for development
 
-# ✅ Installed apps
+# -------------------------------
+# Installed apps
+# -------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,21 +25,24 @@ INSTALLED_APPS = [
     'accounts',
 ]
 
-# ✅ Custom user model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# ✅ DRF settings
+# -------------------------------
+# REST framework
+# -------------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',  # Session based
-        'rest_framework.authentication.BasicAuthentication',    # Optional for testing
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
 }
 
-# ✅ Djoser settings
+# -------------------------------
+# DJOSER configuration
+# -------------------------------
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
@@ -49,13 +53,15 @@ DJOSER = {
     },
 }
 
-# ✅ Custom middleware to disable CSRF for /auth/ and /api/
+# -------------------------------
+# Middleware
+# -------------------------------
+
 class DisableCSRFMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        if request.path.startswith('/auth/') or request.path.startswith('/api/'):
+        if request.path.startswith('/auth/') or request.path.startswith('/api/') or request.path.startswith('/accounts/'):
             setattr(request, '_dont_enforce_csrf_checks', True)
 
-# ✅ Middleware
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -63,7 +69,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
 
-    'e_response.settings.DisableCSRFMiddleware',  # 👈 Add your custom CSRF skipper here
+    'e_response.settings.DisableCSRFMiddleware',  # Custom CSRF middleware
 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -71,11 +77,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# -------------------------------
+# URL configuration
+# -------------------------------
 ROOT_URLCONF = 'e_response.urls'
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ Templates
+# -------------------------------
+# Templates
+# -------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -93,7 +102,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'e_response.wsgi.application'
 
-# ✅ Database (SQLite for dev)
+# -------------------------------
+# Database
+# -------------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -101,7 +112,9 @@ DATABASES = {
     }
 }
 
-# ✅ Password validation
+# -------------------------------
+# Password validation
+# -------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -109,46 +122,48 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ✅ Authentication backends
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-# ✅ Internationalization
+# -------------------------------
+# Internationalization
+# -------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ Static files
-STATIC_URL = 'static/'
+# -------------------------------
+# Static files
+# -------------------------------
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ✅ CORS settings
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True  # Allow session cookie to be sent
-CORS_ALLOWED_ORIGINS = [
-    'http://192.168.1.113:8000',  # Local IP
-    'http://localhost:19000',    # Expo local server
+# -------------------------------
+# CORS settings
+# -------------------------------
+CORS_ALLOW_ALL_ORIGINS = True  # Use only in development
+CORS_ALLOW_CREDENTIALS = True
+
+# -------------------------------
+# CSRF settings
+# -------------------------------
+CSRF_TRUSTED_ORIGINS = [
+    'http://192.168.1.113',
+    'https://deployment-backend-1-r5p6.onrender.com',
 ]
 
-# ✅ CSRF settings
-CSRF_TRUSTED_ORIGINS = ['http://192.168.1.113']
-
-# 🔥 (No need for CSRF_EXEMPT_URLS anymore because middleware handles it)
-
-
-# ✅ Email Configuration for Gmail
+# -------------------------------
+# Email settings (Gmail SMTP)
+# -------------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kristineigdao1903@gmail.com'  # replace with your Gmail
-EMAIL_HOST_PASSWORD = 'tzly grqp vuic yyou'  # use the 16-char app password
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
+EMAIL_HOST_USER = 'kristineigdao1903@gmail.com'
+EMAIL_HOST_PASSWORD = 'tzly grqp vuic yyou'  # App password only
 DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
-# settings.py
 
-SITE_DOMAIN = "http://192.168.1.113:8000"  # or your domain name
-ALLOWED_HOSTS = ['.onrender.com']
+# -------------------------------
+# Custom site domain
+# -------------------------------
+SITE_DOMAIN = "http://192.168.1.113:8000"
