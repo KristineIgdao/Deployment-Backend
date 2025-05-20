@@ -1,6 +1,7 @@
 from pathlib import Path
 from django.utils.deprecation import MiddlewareMixin  # ✅ Add this for custom middleware
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-lq#k$zb)uen@0pb8j%&m54-dr$cmx8s%x#w8y_=4xhiu+4os&t'
@@ -58,6 +59,7 @@ class DisableCSRFMiddleware(MiddlewareMixin):
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
 
@@ -70,6 +72,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'e_response.urls'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # ✅ Templates
 TEMPLATES = [
@@ -147,4 +151,4 @@ DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
 # settings.py
 
 SITE_DOMAIN = "http://192.168.1.113:8000"  # or your domain name
-
+ALLOWED_HOSTS = ['.onrender.com']
