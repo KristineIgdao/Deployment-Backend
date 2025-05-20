@@ -107,22 +107,32 @@ def verify_email(request, uidb64, token):
 @csrf_exempt
 def request_password_reset(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        email = data.get('email')
         try:
-            user = User.objects.get(email=email)
-            otp = str(random.randint(100000, 999999))
-            cache.set(f"otp_{email}", otp, timeout=300)
-            send_mail(
-                "Your OTP Code",
-                f"Your OTP code is: {otp}",
-                "no-reply@example.com",
-                [email],
-                fail_silently=False,
-            )
-            return JsonResponse({"message": "OTP sent to your email."})
-        except User.DoesNotExist:
-            return JsonResponse({"error": "User not found."}, status=404)
+            data = json.loads(request.body)
+            email = data.get('email')
+            if not email:
+                return JsonResponse({"error": "Email is required."}, status=400)
+
+            try:
+                user = User.objects.get(email=email)
+                otp = str(random.randint(100000, 999999))
+                cache.set(f"otp_{email}", otp, timeout=300)  # 5 minutes
+                send_mail(
+                    "Your OTP Code",
+                    f"Your OTP code is: {otp}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False,
+                )
+                return JsonResponse({"message": "OTP sent to your email."})
+            except User.DoesNotExist:
+                return JsonResponse({"error": "User not found."}, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+    # ✅ Handle GET or other methods gracefully
+    return JsonResponse({"detail": "Method not allowed."}, status=405)
 
 @csrf_exempt
 def verify_otp(request):
