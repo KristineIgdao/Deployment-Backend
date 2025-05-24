@@ -11,3 +11,4 @@ services:
         value: django-insecure-lq#k$zb)uen@0pb8j%&m54-dr$cmx8s%x#w8y_=4xhiu+4os&t
       - key: DEBUG
         value: False
+  
