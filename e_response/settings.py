@@ -168,4 +168,11 @@ DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
 # -------------------------------
 SITE_DOMAIN = "http://192.168.1.113:8000"
 
+import os
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Render deploy fix
+if os.environ.get('RENDER'):
+    DEBUG = False
